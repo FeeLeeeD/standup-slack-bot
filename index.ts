@@ -5,11 +5,13 @@ export const config = {
   runtime: "edge",
 };
 
-const app = new Hono().basePath("/api");
+const app = new Hono();
 
 app.get("/", (c) => {
   return c.json({ message: "Hello Hono!" });
 });
+
+export default handle(app);
 
 /* Standup */
 
@@ -69,5 +71,3 @@ app.get("/", (c) => {
 
 //   return data.choices?.[0]?.message?.content || "No summary generated.";
 // }
-
-export default handle(app);
