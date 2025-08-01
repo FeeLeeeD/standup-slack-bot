@@ -15,7 +15,7 @@ app.get("/", (c) => {
 const PORTKEY_API_KEY = process.env.PORTKEY_API_KEY;
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 
-app.post("/", async (c) => {
+app.post("/standup", async (c) => {
   const body = await c.req.parseBody();
   const username = String(body["user_name"] || "");
 
