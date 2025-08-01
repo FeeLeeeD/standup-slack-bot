@@ -1,4 +1,3 @@
-import axios from "axios";
 import { app } from ".";
 
 const PORTKEY_API_KEY = process.env.PORTKEY_API_KEY!;
@@ -24,12 +23,14 @@ async function fetchGitHubActivity(username: string) {
   const isoDate = since.toISOString().split("T")[0];
 
   const url = `https://api.github.com/search/issues?q=author:${username}+updated:>${isoDate}`;
-  const { data } = await axios.get(url, {
+  const response = await fetch(url, {
     headers: {
       Authorization: `Bearer ${GITHUB_TOKEN}`,
       Accept: "application/vnd.github+json",
     },
   });
+  const data = await response.json();
+
 
   return (data.items ?? []).slice(0, 5);
 }
@@ -42,19 +43,21 @@ async function generateStandupSummary(githubItems: any[]) {
     .join("\n");
   const prompt = `You are a software engineer writing a daily Slack standup. Based on this GitHub activity:\n${list}\nWrite a concise and clear standup report. Mention PRs, issues, and key actions. Format as bullet points.`;
 
-  const { data } = await axios.post(
+  const response = await fetch(
     "https://api.portkey.ai/v1/chat/completions",
     {
-      model: "@openai/gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }],
-    },
-    {
+      method: "POST",
+      body: JSON.stringify({
+        model: "@openai/gpt-3.5-turbo",
+        messages: [{ role: "user", content: prompt }],
+      }),
       headers: {
         Authorization: `Bearer ${PORTKEY_API_KEY}`,
         "Content-Type": "application/json",
       },
     }
   );
+  const data = await response.json();
 
   return data.choices?.[0]?.message?.content || "No summary generated.";
 }
