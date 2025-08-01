@@ -1,10 +1,21 @@
-import app from ".";
+import { Hono } from "hono";
 
-const PORTKEY_API_KEY = process.env.PORTKEY_API_KEY!;
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN!;
+export const config = {
+  runtime: "edge",
+};
 
-app.post("/standup", async (c) => {
-  // Slack sends application/x-www-form-urlencoded
+const app = new Hono();
+
+app.get("/", (c) => {
+  return c.json({ message: "Hello Hono!" });
+});
+
+/* Standup */
+
+const PORTKEY_API_KEY = process.env.PORTKEY_API_KEY;
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+
+app.post("/", async (c) => {
   const body = await c.req.parseBody();
   const username = String(body["user_name"] || "");
 
@@ -57,3 +68,5 @@ async function generateStandupSummary(githubItems: any[]) {
 
   return data.choices?.[0]?.message?.content || "No summary generated.";
 }
+
+export default app;
