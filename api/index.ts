@@ -1,10 +1,11 @@
 import { Hono } from "hono";
+import { handle } from "hono/vercel";
 
 export const config = {
   runtime: "edge",
 };
 
-const app = new Hono();
+const app = new Hono().basePath("/api");
 
 app.get("/", (c) => {
   return c.json({ message: "Hello Hono!" });
@@ -69,4 +70,4 @@ app.get("/", (c) => {
 //   return data.choices?.[0]?.message?.content || "No summary generated.";
 // }
 
-export default app;
+export default handle(app);
