@@ -1,4 +1,4 @@
-import { app } from ".";
+import app from ".";
 
 const PORTKEY_API_KEY = process.env.PORTKEY_API_KEY!;
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN!;
@@ -31,7 +31,6 @@ async function fetchGitHubActivity(username: string) {
   });
   const data = await response.json();
 
-
   return (data.items ?? []).slice(0, 5);
 }
 
@@ -43,20 +42,17 @@ async function generateStandupSummary(githubItems: any[]) {
     .join("\n");
   const prompt = `You are a software engineer writing a daily Slack standup. Based on this GitHub activity:\n${list}\nWrite a concise and clear standup report. Mention PRs, issues, and key actions. Format as bullet points.`;
 
-  const response = await fetch(
-    "https://api.portkey.ai/v1/chat/completions",
-    {
-      method: "POST",
-      body: JSON.stringify({
-        model: "@openai/gpt-3.5-turbo",
-        messages: [{ role: "user", content: prompt }],
-      }),
-      headers: {
-        Authorization: `Bearer ${PORTKEY_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-    }
-  );
+  const response = await fetch("https://api.portkey.ai/v1/chat/completions", {
+    method: "POST",
+    body: JSON.stringify({
+      model: "@openai/gpt-3.5-turbo",
+      messages: [{ role: "user", content: prompt }],
+    }),
+    headers: {
+      Authorization: `Bearer ${PORTKEY_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+  });
   const data = await response.json();
 
   return data.choices?.[0]?.message?.content || "No summary generated.";
